@@ -146,10 +146,10 @@ def find_last_page():
     print "last page is" + str(LAST_PAGE)
 
 
-def wechat_notify(item):
+def wechat_notify(update_date):
     global SCKEY
     url = "http://sc.ftqq.com/"+SCKEY+".send"
-    text = "Po于"+item.create_date+"\n更新了\n"+item.content
+    text = "Po于"+str(update_date)+"更新了"
     try:
         response = requests.post(url + "?text=" + str(text))
         if response.status_code == 200:
@@ -191,7 +191,7 @@ def write_config():
     写入配置，包括LAST_Modify POID, THREAD_ID
     :return:
     """
-    content = str(LAST_MODIFIED_TIME) + "\n" + str(PO_ID) + "\n" + str(THREAD_ID)
+    content = str(LAST_MODIFIED_TIME) + " " + str(PO_ID) + " " + str(THREAD_ID)
     with codecs.open('Adnmb.config', 'w', encoding='utf-8') as f:
         f.write(content)
 
@@ -235,9 +235,11 @@ def find_last_modify():
             if item["thread_id"] > LAST_MODIFIED_TIME:
                 if item["uid"] == PO_ID:
                     LAST_MODIFIED_TIME = item["thread_id"]
+                    print "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+                    print item
                     write_config()
                     print "更新了！"
-                    wechat_notify(item)
+                    wechat_notify(item["create_date"])
                     return
 
             if item["thread_id"] == LAST_MODIFIED_TIME:
